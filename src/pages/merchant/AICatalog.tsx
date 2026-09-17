@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { Upload, Sparkles, Check, ChevronRight } from 'lucide-react';
+import { Upload, Sparkles, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 import { supabase } from '../../lib/supabase';
 
 export default function MerchantAICatalog() {
   const [step, setStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState('');
   
   // Form State
@@ -17,7 +16,6 @@ export default function MerchantAICatalog() {
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     const file = e.target.files[0];
-    setImageFile(file);
     setPreviewUrl(URL.createObjectURL(file));
     
     setIsProcessing(true);

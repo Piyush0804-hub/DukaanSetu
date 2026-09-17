@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { supabase } from './lib/supabase';
 import { AppProvider } from './context/AppProvider';
 
@@ -23,7 +23,7 @@ import MerchantOrders from './pages/merchant/Orders';
 import MerchantAICatalog from './pages/merchant/AICatalog';
 
 // Auth Guard for Merchant
-function MerchantGuard({ children }: { children: JSX.Element }) {
+function MerchantGuard({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 

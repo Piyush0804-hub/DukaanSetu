@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Store, Package, ShoppingCart, BarChart, ScanLine, LogOut } from 'lucide-react';
+import { Package, ShoppingCart, BarChart, ScanLine, LogOut } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 export default function MerchantLayout() {
