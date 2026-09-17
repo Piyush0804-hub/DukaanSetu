@@ -2,18 +2,82 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Truck, Store, CreditCard, Banknote, MapPin } from 'lucide-react';
 import { useAppContext } from '../../context/AppProvider';
+import { supabase } from '../../lib/supabase';
 
 export default function Checkout() {
-  const { cartTotal, cart } = useAppContext();
+  const { cartTotal, cart, clearCart } = useAppContext();
   const navigate = useNavigate();
   const [deliveryType, setDeliveryType] = useState('delivery');
   const [paymentMethod, setPaymentMethod] = useState('upi');
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handlePlaceOrder = (e: React.FormEvent) => {
+  const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, clear cart and hit API
-    // For prototype, just jump to tracking
-    navigate('/order/DS1042');
+    if (cart.length === 0) return;
+    
+    setIsProcessing(true);
+    
+    try {
+      // Group items by store because an order is per-store
+      const cartByStore = cart.reduce((acc, item) => {
+        if (!acc[item.storeId]) acc[item.storeId] = [];
+        acc[item.storeId].push(item);
+        return acc;
+      }, {} as Record<string, typeof cart>);
+      
+      let firstOrderId = null;
+      
+      // Get current user for customer_id
+      const { data: { user } } = await supabase.auth.getUser();
+
+      // For each store, create an order and its order_items
+      for (const [storeId, items] of Object.entries(cartByStore)) {
+        const storeTotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const finalAmount = storeTotal + (deliveryType === 'delivery' ? 20 : 0); // Include delivery fee if applicable per store or total. Keeping simple.
+        
+        // 1. Insert Order
+        const { data: order, error: orderError } = await supabase
+          .from('orders')
+          .insert([{
+            store_id: storeId,
+            customer_id: user?.id || null, // Optional if anonymous checkout isn't strictly blocked
+            total_amount: finalAmount,
+            status: 'new',
+            delivery_type: deliveryType,
+            payment_method: paymentMethod
+          }])
+          .select()
+          .single();
+          
+        if (orderError) throw orderError;
+        
+        if (!firstOrderId) firstOrderId = order.id;
+
+        // 2. Insert Order Items
+        const orderItemsToInsert = items.map(item => ({
+          order_id: order.id,
+          product_id: item.productId,
+          quantity: item.quantity,
+          price_at_time: item.price
+        }));
+        
+        const { error: itemsError } = await supabase
+          .from('order_items')
+          .insert(orderItemsToInsert);
+          
+        if (itemsError) throw itemsError;
+      }
+
+      // Success! Clear cart and redirect
+      clearCart();
+      navigate(`/order/${firstOrderId}`);
+      
+    } catch (error) {
+      console.error("Error placing order:", error);
+      alert("There was an error placing your order. Please try again.");
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   if (cart.length === 0) {
@@ -90,8 +154,12 @@ export default function Checkout() {
             <span className="text-gray-600 font-medium">Total Amount</span>
             <span className="text-2xl font-bold text-gray-900">₹{cartTotal + (deliveryType === 'delivery' ? 20 : 0)}</span>
           </div>
-          <button type="submit" className="w-full bg-brand-primary text-white py-4 rounded-xl font-bold text-lg hover:bg-kirana-700 transition shadow-sm">
-            Place Order
+          <button 
+            type="submit" 
+            disabled={isProcessing}
+            className={`w-full text-white py-4 rounded-xl font-bold text-lg transition shadow-sm ${isProcessing ? 'bg-kirana-300 cursor-not-allowed' : 'bg-brand-primary hover:bg-kirana-700'}`}
+          >
+            {isProcessing ? 'Processing...' : 'Place Order'}
           </button>
         </div>
       </form>

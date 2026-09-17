@@ -1,5 +1,3 @@
-
-import { stores } from '../../data/mockData';
 import { TrendingDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -28,11 +26,11 @@ export default function ComparePrices() {
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-primary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
               Best Price
             </div>
-            <h3 className="font-bold text-gray-900 mb-1">{stores[0].name}</h3>
-            <p className="text-xs text-gray-500 mb-4">{stores[0].distance} km away</p>
+            <h3 className="font-bold text-gray-900 mb-1">Gupta General Store</h3>
+            <p className="text-xs text-gray-500 mb-4">0.5 km away</p>
             
             <div className="text-3xl font-bold text-brand-primary mb-1">₹489</div>
-            <p className="text-sm font-medium text-brand-accent flex items-center gap-1 mb-6">
+            <p className="text-sm font-medium text-brand-primary flex items-center gap-1 mb-6">
               <TrendingDown className="w-4 h-4" /> Save ₹26
             </p>
             
@@ -45,8 +43,8 @@ export default function ComparePrices() {
           </div>
 
           <div className="bg-white rounded-xl p-5 border border-gray-200 opacity-80">
-            <h3 className="font-bold text-gray-900 mb-1">{stores[1].name}</h3>
-            <p className="text-xs text-gray-500 mb-4">{stores[1].distance} km away</p>
+            <h3 className="font-bold text-gray-900 mb-1">Sharma Supermart</h3>
+            <p className="text-xs text-gray-500 mb-4">1.2 km away</p>
             
             <div className="text-3xl font-bold text-gray-900 mb-1">₹497</div>
             <p className="text-sm font-medium text-transparent mb-6">Spacer</p>
@@ -60,8 +58,8 @@ export default function ComparePrices() {
           </div>
 
           <div className="bg-white rounded-xl p-5 border border-gray-200 opacity-60">
-            <h3 className="font-bold text-gray-900 mb-1">{stores[2].name}</h3>
-            <p className="text-xs text-gray-500 mb-4">{stores[2].distance} km away</p>
+            <h3 className="font-bold text-gray-900 mb-1">Daily Needs Shop</h3>
+            <p className="text-xs text-gray-500 mb-4">2.1 km away</p>
             
             <div className="text-3xl font-bold text-gray-900 mb-1">₹515</div>
             <p className="text-sm font-medium text-transparent mb-6">Spacer</p>

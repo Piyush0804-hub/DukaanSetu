@@ -1,7 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingBasket, Trash2, Plus, Minus, ArrowRight } from 'lucide-react';
 import { useAppContext } from '../../context/AppProvider';
-import { baseProducts, stores } from '../../data/mockData';
 
 export default function Cart() {
   const { cart, updateQuantity, cartTotal } = useAppContext();
@@ -15,7 +14,7 @@ export default function Cart() {
         </div>
         <h2 className="text-2xl font-bold text-gray-800 mb-2">Your basket is empty</h2>
         <p className="text-gray-500 mb-8">Looks like you haven't added any groceries yet.</p>
-        <Link to="/" className="btn-primary">
+        <Link to="/" className="bg-brand-primary text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-brand-primary/90 transition shadow-sm">
           Start Shopping
         </Link>
       </div>
@@ -41,8 +40,9 @@ export default function Cart() {
         {/* Cart Items */}
         <div className="flex-1 space-y-6">
           {Object.entries(cartByStore).map(([storeId, items]) => {
-            const store = stores.find(s => s.id === storeId);
             const storeTotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            // Get store name from the first item
+            const storeName = items[0].storeName || 'Local Store';
             
             return (
               <div key={storeId} className="bg-white rounded-2xl shadow-sm border border-kirana-200 overflow-hidden">
@@ -50,7 +50,7 @@ export default function Cart() {
                   <div>
                     <p className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-0.5">Ordering from</p>
                     <Link to={`/store/${storeId}`} className="font-bold text-brand-primary text-lg hover:underline">
-                      {store?.name}
+                      {storeName}
                     </Link>
                   </div>
                   <div className="text-right">
@@ -61,20 +61,21 @@ export default function Cart() {
                 
                 <div className="divide-y divide-gray-100 p-4">
                   {items.map(item => {
-                    const product = baseProducts.find(p => p.id === item.productId);
-                    if (!product) return null;
-                    
                     return (
                       <div key={item.productId} className="py-4 first:pt-0 last:pb-0 flex gap-4">
                         <div className="w-16 h-16 bg-gray-50 rounded border border-gray-100 p-1">
-                          <img src={product.image} alt={product.name} className="w-full h-full object-contain mix-blend-multiply" />
+                          {item.image ? (
+                            <img src={item.image} alt={item.name} className="w-full h-full object-contain mix-blend-multiply" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-2xl">🛍️</div>
+                          )}
                         </div>
                         <div className="flex-1">
                           <div className="flex justify-between mb-1">
-                            <h3 className="font-bold text-gray-800">{product.name}</h3>
+                            <h3 className="font-bold text-gray-800">{item.name || 'Product'}</h3>
                             <p className="font-bold text-gray-900">₹{item.price * item.quantity}</p>
                           </div>
-                          <p className="text-sm text-gray-500 mb-3">{product.packSize} • ₹{item.price}/each</p>
+                          <p className="text-sm text-gray-500 mb-3">{item.packSize || '1 item'} • ₹{item.price}/each</p>
                           
                           <div className="flex items-center justify-between">
                             <div className="flex items-center border border-gray-200 rounded-lg bg-gray-50">
@@ -119,20 +120,20 @@ export default function Cart() {
               </div>
               <div className="flex justify-between text-gray-600">
                 <span>Platform Fee</span>
-                <span className="font-medium text-gray-900">₹0</span>
+                <span className="font-medium text-gray-900">₹10</span>
               </div>
             </div>
             
             <div className="border-t border-dashed border-gray-200 pt-4 mb-6">
               <div className="flex justify-between font-bold text-lg">
                 <span>To Pay</span>
-                <span>₹{cartTotal}</span>
+                <span>₹{cartTotal + 10}</span>
               </div>
             </div>
             
             <button 
               onClick={() => navigate('/checkout')}
-              className="w-full bg-brand-primary text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-kirana-700 transition shadow-sm"
+              className="w-full bg-brand-primary text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-brand-primary/90 transition shadow-sm"
             >
               Proceed to Checkout <ArrowRight className="w-5 h-5" />
             </button>

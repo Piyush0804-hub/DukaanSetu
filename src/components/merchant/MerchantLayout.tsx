@@ -1,8 +1,15 @@
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Store, Package, ShoppingCart, BarChart, ScanLine, LogOut } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
 
 export default function MerchantLayout() {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/login');
+  };
 
   const menu = [
     { name: 'Dashboard', path: '/merchant', icon: BarChart },
@@ -17,7 +24,7 @@ export default function MerchantLayout() {
       <aside className="w-full md:w-64 bg-white border-r border-kirana-100 text-gray-800 flex flex-col hidden md:flex sticky top-0 h-screen">
         <div className="p-6 border-b border-kirana-100">
           <Link to="/" className="text-xl font-bold font-serif text-brand-primary flex items-center gap-2 mb-6">
-            <Store className="text-brand-primary" /> DukaanSetu
+            <img src="/logo.jpg" alt="DukaanSetu Logo" className="w-8 h-8 object-contain rounded" /> DukaanSetu
           </Link>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-brand-primary text-white rounded-lg flex items-center justify-center font-bold text-lg">
@@ -25,7 +32,7 @@ export default function MerchantLayout() {
             </div>
             <div>
               <p className="font-bold leading-tight">Gupta General</p>
-              <p className="text-xs text-brand-accent font-medium">🟢 Store Live</p>
+              <p className="text-xs text-brand-accent font-medium">🛒 Store Live</p>
             </div>
           </div>
         </div>
@@ -55,19 +62,19 @@ export default function MerchantLayout() {
         </nav>
 
         <div className="p-4 border-t border-kirana-100">
-          <Link to="/" className="flex items-center gap-3 px-4 py-3 text-gray-500 hover:text-gray-900 transition-colors">
-            <LogOut className="w-5 h-5" /> Exit to Customer
-          </Link>
+          <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-gray-500 hover:text-red-500 transition-colors">
+            <LogOut className="w-5 h-5" /> Logout
+          </button>
         </div>
       </aside>
 
       {/* Mobile Topbar */}
       <div className="md:hidden bg-white border-b border-kirana-100 text-gray-900 p-4 sticky top-0 z-50 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-2">
-          <Store className="text-brand-primary w-5 h-5" />
+          <img src="/logo.jpg" alt="DukaanSetu Logo" className="w-6 h-6 object-contain rounded" />
           <span className="font-bold text-lg font-serif">Gupta General</span>
         </div>
-        <Link to="/" className="text-xs text-gray-500 underline">Exit</Link>
+        <button onClick={handleLogout} className="text-xs text-gray-500 underline hover:text-red-500">Logout</button>
       </div>
 
       {/* Mobile Navigation Scroll */}

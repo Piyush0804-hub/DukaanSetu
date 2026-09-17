@@ -1,9 +1,24 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, MapPin, ChevronRight, Star, Clock } from 'lucide-react';
-import { categories, stores } from '../../data/mockData';
+import { useEffect, useState } from 'react';
+import { supabase } from '../../lib/supabase';
+import { categories } from '../../data/mockData';
 
 export default function CustomerHome() {
   const navigate = useNavigate();
+  const [stores, setStores] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchStores() {
+      const { data, error } = await supabase.from('stores').select('*').limit(8);
+      if (!error && data) {
+        setStores(data);
+      }
+      setLoading(false);
+    }
+    fetchStores();
+  }, []);
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -32,7 +47,6 @@ export default function CustomerHome() {
           </div>
         </div>
         <div className="hidden md:block w-64 h-64 bg-kirana-100 rounded-full absolute -right-10 -bottom-10 opacity-50 blur-3xl"></div>
-        {/* Placeholder for grocery image */}
         <div className="z-10 bg-white p-4 rounded-xl transform rotate-3 shadow-md border border-kirana-100">
           <div className="text-4xl">🛒 🌾 🥛</div>
         </div>
@@ -82,42 +96,50 @@ export default function CustomerHome() {
           </Link>
         </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {stores.map(store => (
-            <Link to={`/store/${store.id}`} key={store.id} className="card p-4 hover:shadow-md transition-shadow group">
-              <div className="flex justify-between items-start mb-3">
-                <h3 className="font-bold text-lg text-gray-800 group-hover:text-brand-primary transition-colors">{store.name}</h3>
-                {store.verified && (
-                  <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1">
-                    ✓ Verified
+        {loading ? (
+          <div className="py-8 text-center text-gray-500">Loading nearby stores...</div>
+        ) : stores.length === 0 ? (
+          <div className="py-8 text-center text-gray-500 bg-kirana-50 rounded-xl border border-kirana-100">
+            No stores registered yet. Be the first to add your store!
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {stores.map(store => (
+              <Link to={`/store/${store.id}`} key={store.id} className="card p-4 hover:shadow-md transition-shadow group">
+                <div className="flex justify-between items-start mb-3">
+                  <h3 className="font-bold text-lg text-gray-800 group-hover:text-brand-primary transition-colors">{store.name}</h3>
+                  {store.verified && (
+                    <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1">
+                      ✓ Verified
+                    </span>
+                  )}
+                </div>
+                
+                <div className="flex items-center gap-3 text-sm text-gray-600 mb-4">
+                  <span className="flex items-center gap-1 bg-gray-100 px-1.5 py-0.5 rounded">
+                    <Star className="w-3.5 h-3.5 text-brand-primary fill-brand-primary" />
+                    <span className="font-medium">{store.rating || '5.0'}</span>
                   </span>
-                )}
-              </div>
-              
-              <div className="flex items-center gap-3 text-sm text-gray-600 mb-4">
-                <span className="flex items-center gap-1 bg-gray-100 px-1.5 py-0.5 rounded">
-                  <Star className="w-3.5 h-3.5 text-brand-primary fill-brand-primary" />
-                  <span className="font-medium">{store.rating}</span>
-                </span>
-                <span className="flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5" />
-                  {store.distance} km
-                </span>
-              </div>
-              
-              <div className="flex items-center justify-between text-sm border-t border-gray-100 pt-3">
-                <div className="flex items-center gap-1 text-gray-500">
-                  <Clock className="w-4 h-4" />
-                  {store.deliveryTime}
+                  <span className="flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5" />
+                    {store.distance || '0.5'} km
+                  </span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <span className={`w-2 h-2 rounded-full ${store.isOpen ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                  <span className="text-xs font-medium">{store.isOpen ? 'Open' : 'Closed'}</span>
+                
+                <div className="flex items-center justify-between text-sm border-t border-gray-100 pt-3">
+                  <div className="flex items-center gap-1 text-gray-500">
+                    <Clock className="w-4 h-4" />
+                    {store.delivery_time || '25-35 min'}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className={`w-2 h-2 rounded-full ${store.is_open ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                    <span className="text-xs font-medium">{store.is_open ? 'Open' : 'Closed'}</span>
+                  </div>
                 </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
       
       {/* Zero Commission / USP Section */}

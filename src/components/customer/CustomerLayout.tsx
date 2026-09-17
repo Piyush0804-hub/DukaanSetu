@@ -1,12 +1,19 @@
-import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, Search, ShoppingBasket, User, MapPin } from 'lucide-react';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Home, Search, ShoppingBasket, User, MapPin, LogOut } from 'lucide-react';
 import { useAppContext } from '../../context/AppProvider';
+import { supabase } from '../../lib/supabase';
 
 export default function CustomerLayout() {
   const { currentLocation, cartCount } = useAppContext();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const isActive = (path: string) => location.pathname === path ? 'text-brand-primary' : 'text-gray-500';
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate('/login');
+  };
 
   return (
     <div className="min-h-screen bg-brand-light flex flex-col pb-16 md:pb-0">
@@ -14,7 +21,7 @@ export default function CustomerLayout() {
       <header className="bg-white sticky top-0 z-50 border-b border-kirana-100 shadow-sm">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <ShoppingBasket className="text-brand-primary w-7 h-7" />
+            <img src="/logo.jpg" alt="DukaanSetu Logo" className="w-8 h-8 object-contain rounded" />
             <span className="font-bold text-xl tracking-tight text-brand-primary">DukaanSetu</span>
           </Link>
           
@@ -35,14 +42,19 @@ export default function CustomerLayout() {
                 </span>
               )}
             </Link>
-            <div className="w-8 h-8 rounded-full bg-kirana-200 flex items-center justify-center text-brand-primary font-bold">
-              U
-            </div>
+            <button onClick={handleLogout} className="flex items-center gap-2 text-gray-500 hover:text-red-500 transition font-medium text-sm">
+              <LogOut className="w-5 h-5" /> Logout
+            </button>
           </div>
           
-          <div className="md:hidden flex items-center gap-2 bg-kirana-50 px-2 py-1 rounded-md text-xs font-medium text-brand-text truncate max-w-[150px]">
-            <MapPin className="w-3 h-3 text-brand-primary flex-shrink-0" />
-            <span className="truncate">{currentLocation}</span>
+          <div className="md:hidden flex items-center gap-4">
+            <div className="flex items-center gap-2 bg-kirana-50 px-2 py-1 rounded-md text-xs font-medium text-brand-text truncate max-w-[150px]">
+              <MapPin className="w-3 h-3 text-brand-primary flex-shrink-0" />
+              <span className="truncate">{currentLocation}</span>
+            </div>
+            <button onClick={handleLogout} className="text-gray-500 hover:text-red-500 transition">
+              <LogOut className="w-5 h-5" />
+            </button>
           </div>
         </div>
       </header>
