@@ -50,4 +50,4 @@ DukaanSetu is a dual-sided e-commerce marketplace built for local grocery stores
 
 ## 🌐 Live Demo
 * **Frontend:** [https://dukaan-setu-liart.vercel.app](https://dukaan-setu-liart.vercel.app)
-* **Backend API:** [https://dukaan-setu-backend.vercel.app](https://dukaan-setu-backend.vercel.app)
+
